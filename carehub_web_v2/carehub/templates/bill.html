@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Bill - {{ name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>✅ Bill Generated Successfully</h2>
+  <button onclick="window.print()" class="btn-primary">🖨️ Print Bill</button>
+</div>
+
+<div class="bill-wrapper" id="bill-print">
+  <div class="bill-card">
+    <div class="bill-header">
+      <div class="bill-logo">🏥</div>
+      <h1>CareHub Multispeciality Hospital</h1>
+      <p>Smart Hospital Billing System</p>
+    </div>
+    <div class="bill-divider"></div>
+    <div class="bill-info-grid">
+      <div class="bill-info-row"><span>Patient ID</span><strong>#{{ patient_id }}</strong></div>
+      <div class="bill-info-row"><span>Patient Name</span><strong>{{ name }}</strong></div>
+      <div class="bill-info-row"><span>Age</span><strong>{{ age }} years</strong></div>
+      <div class="bill-info-row"><span>Gender</span><strong>{{ gender.title() }}</strong></div>
+      <div class="bill-info-row"><span>Weight</span><strong>{{ weight }} kg</strong></div>
+      <div class="bill-info-row"><span>Contact</span><strong>{{ contact }}</strong></div>
+      <div class="bill-info-row"><span>Symptoms</span><strong>{{ symptoms | join(', ') | title }}</strong></div>
+    </div>
+    <div class="bill-divider"></div>
+    <h3 class="medicines-heading">💊 Medicines Prescribed</h3>
+    <table class="medicines-table">
+      <thead><tr><th>Medicine</th><th>Amount</th></tr></thead>
+      <tbody>
+        {% for med, price in items %}
+        <tr><td>{{ med }}</td><td>₹{{ price }}</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="total-row"><td><strong>Total Amount</strong></td><td><strong>₹{{ total }}</strong></td></tr>
+      </tfoot>
+    </table>
+    <div class="bill-divider"></div>
+    <div class="payment-section">
+      <div class="payment-mode">💳 Payment Mode: <strong>{{ payment_mode }}</strong></div>
+      {% if qr_b64 %}
+      <div class="qr-section">
+        <p>📲 Scan to pay ₹{{ total }} via GPay</p>
+        <img src="data:image/png;base64,{{ qr_b64 }}" alt="GPay QR Code" class="qr-image">
+        <p class="upi-id">UPI: nandhakumar.s.jnandhu-1@okhdfcbank</p>
+      </div>
+      {% endif %}
+    </div>
+    <div class="bill-footer">Thank you for choosing CareHub! Get well soon 💙</div>
+  </div>
+</div>
+
+<div class="bill-actions no-print">
+  <a href="{{ wa_link }}" target="_blank" class="btn-whatsapp">
+    📲 Send Bill on WhatsApp
+  </a>
+  <a href="{{ url_for('add_patient') }}" class="btn-secondary">+ New Patient</a>
+  <a href="{{ url_for('patients') }}" class="btn-primary">View All Patients</a>
+</div>
+
+<style>
+@media print {
+  .navbar, .page-header, .bill-actions, .no-print { display: none !important; }
+  body { background: white; }
+  .bill-card { box-shadow: none; border: 1px solid #ddd; }
+}
+</style>
+{% endblock %}

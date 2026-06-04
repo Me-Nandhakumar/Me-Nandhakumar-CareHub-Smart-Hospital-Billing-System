@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}All Patients{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>👥 Patient Records</h2>
+  <a href="{{ url_for('add_patient') }}" class="btn-primary">+ Add Patient</a>
+</div>
+
+<div class="search-bar">
+  <form method="GET">
+    <input type="text" name="q" placeholder="🔍 Search by name or contact..." value="{{ query }}" class="search-input">
+    <button type="submit" class="btn-primary">Search</button>
+    {% if query %}<a href="{{ url_for('patients') }}" class="btn-secondary">Clear</a>{% endif %}
+  </form>
+</div>
+
+<div class="section-card">
+  {% if rows %}
+  <p class="result-count">{{ rows|length }} patient(s) found</p>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>#</th><th>Name</th><th>Age</th><th>Gender</th><th>Contact</th>
+        <th>Symptoms</th><th>Medicines</th><th>Amount</th><th>Payment</th><th>Date</th><th>Bill</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row[0] }}</td>
+        <td><strong>{{ row[1] }}</strong></td>
+        <td>{{ row[2] }}</td>
+        <td>{{ row[3].title() if row[3] else '' }}</td>
+        <td>{{ row[5] }}</td>
+        <td><span class="tag">{{ row[6] }}</span></td>
+        <td>{{ row[7][:30] }}{% if row[7] and row[7]|length > 30 %}...{% endif %}</td>
+        <td><strong>₹{{ row[8] }}</strong></td>
+        <td><span class="badge badge-{{ 'gpay' if row[9]=='GPay' else 'cash' }}">{{ row[9] }}</span></td>
+        <td>{{ row[10].strftime('%d %b %Y') if row[10] else '-' }}</td>
+        <td><a href="{{ url_for('patient_detail', pid=row[0]) }}" class="btn-sm">View</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    {% if query %}No patients found for "{{ query }}"{% else %}No patients registered yet.{% endif %}
+    <br><a href="{{ url_for('add_patient') }}">Add first patient →</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

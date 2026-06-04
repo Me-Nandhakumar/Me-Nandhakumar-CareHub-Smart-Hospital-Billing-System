@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Appointments{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>📅 Appointments</h2>
+  <a href="{{ url_for('add_appointment') }}" class="btn-primary">+ Book Appointment</a>
+</div>
+
+<div class="filter-bar">
+  <a href="{{ url_for('appointments') }}" class="filter-btn {{ 'active' if not status_filter }}">All</a>
+  <a href="{{ url_for('appointments', status='Scheduled') }}" class="filter-btn {{ 'active' if status_filter=='Scheduled' }}">🟡 Scheduled</a>
+  <a href="{{ url_for('appointments', status='Completed') }}" class="filter-btn {{ 'active' if status_filter=='Completed' }}">🟢 Completed</a>
+  <a href="{{ url_for('appointments', status='Cancelled') }}" class="filter-btn {{ 'active' if status_filter=='Cancelled' }}">🔴 Cancelled</a>
+</div>
+
+<div class="section-card">
+  {% if rows %}
+  <p class="result-count">{{ rows|length }} appointment(s)</p>
+  <table class="data-table">
+    <thead>
+      <tr><th>#</th><th>Patient</th><th>Contact</th><th>Doctor</th><th>Dept</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>{{ r[0] }}</td>
+        <td><strong>{{ r[1] }}</strong></td>
+        <td>{{ r[2] }}</td>
+        <td>{{ r[3] }}</td>
+        <td><span class="tag">{{ r[4] }}</span></td>
+        <td>{{ r[5] }}</td>
+        <td>{{ r[6] }}</td>
+        <td>{{ r[7][:30] if r[7] else '-' }}</td>
+        <td>
+          <span class="badge badge-{{ 'scheduled' if r[8]=='Scheduled' else ('completed' if r[8]=='Completed' else 'cancelled') }}">
+            {{ r[8] }}
+          </span>
+        </td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            {% if r[8] != 'Completed' %}
+            <a href="{{ url_for('update_appt_status', aid=r[0], status='Completed') }}" class="btn-sm btn-green">✓ Done</a>
+            {% endif %}
+            {% if r[8] != 'Cancelled' %}
+            <a href="{{ url_for('update_appt_status', aid=r[0], status='Cancelled') }}" class="btn-sm btn-red">✗ Cancel</a>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">No appointments found. <a href="{{ url_for('add_appointment') }}">Book one →</a></div>
+  {% endif %}
+</div>
+{% endblock %}
